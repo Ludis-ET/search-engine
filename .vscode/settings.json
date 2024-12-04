@@ -1,0 +1,12 @@
+{
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.errors.incompleteClasspath.severity": "ignore", 
+  "editor.formatOnSave": true, 
+  "files.exclude": {
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.vscode": true
+  },
+  "java.project.sourcePaths": ["src"],
+  "java.project.outputPath": "bin"
+}
