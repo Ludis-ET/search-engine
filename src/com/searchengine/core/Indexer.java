@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Indexer extends FileHandler {
-    private Map<String, String> fileContentMap; // Maps file names to their content
+    final private Map<String, String> fileContentMap; // Maps file names to their content
 
     public Indexer() {
         fileContentMap = new HashMap<>();
