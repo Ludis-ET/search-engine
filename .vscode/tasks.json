@@ -1,0 +1,34 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Compile Java",
+      "type": "shell",
+      "command": "javac",
+      "args": [
+        "-d",
+        "bin",
+        "src/com/searchengine/*.java",
+        "src/com/searchengine/engine/*.java",
+        "src/com/searchengine/models/*.java",
+        "src/com/searchengine/processors/*.java",
+        "src/com/searchengine/utils/*.java",
+        "src/com/searchengine/exceptions/*.java"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$javac"],
+      "detail": "Compile Java source files"
+    },
+    {
+      "label": "Run Java Program",
+      "type": "shell",
+      "command": "java",
+      "args": ["-cp", "bin", "com.searchengine.Main"],
+      "group": "build",
+      "dependsOn": "Compile Java"
+    }
+  ]
+}
