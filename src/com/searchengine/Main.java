@@ -1,6 +1,6 @@
 package com.searchengine;
 
-import com.searchengine.core.Indexer;
+import com.searchengine.engine.localDB.Indexer;
 
 public class Main {
     public static void main(String[] args) {
