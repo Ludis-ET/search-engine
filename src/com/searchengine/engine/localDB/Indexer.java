@@ -1,45 +1,60 @@
 package com.searchengine.engine.localDB;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-public class Indexer extends FileHandler {
-    final private Map<String, String> fileContentMap; // Maps file names to their content
+public class Indexer {
+    final private Map<String, List<String>> index;
+    final private FileHandler fileHandler;
 
-    public Indexer() {
-        fileContentMap = new HashMap<>();
+    public Indexer(String directoryPath) {
+        this.index = new HashMap<>();
+        this.fileHandler = new FileHandler(directoryPath);
     }
 
-    // Builds the in-memory storage by reading files from a directory
-    public void buildIndex(String directoryPath) {
-        File[] files = listFiles(directoryPath, ".txt");
-        if (files != null) {
-            for (File file : files) {
-                try {
-                    String content = readFileContent(file);
-                    fileContentMap.put(file.getName(), content);
-                } catch (IOException e) {
-                    System.err.println("Error reading file: " + file.getName());
-                }
+
+    /**
+     * Reads all the files in the directory, extracts words, and updates the index.
+     */
+    public void indexFiles(String extention) {
+        File[] files = fileHandler.listFiles(extention);
+        for (File file : files) {
+            String content = fileHandler.readFileContent(file);
+            String[] words = content.split("\\W+"); 
+            for (String word : words) {
+                word = word.toLowerCase();
+                index.computeIfAbsent(word, k -> new ArrayList<>()).add(file.getName());
             }
-        } else {
-            System.err.println("No files found in directory: " + directoryPath);
         }
     }
 
-    // Retrieves the content of a file by its name
-    public String getFileContent(String fileName) {
-        return fileContentMap.getOrDefault(fileName, "File not found.");
+
+    /**
+     * Searches for the specified query in the index and returns a list of files that contain the word.
+     * @param query The word to search for.
+     * @return A list of file names that contain the query word.
+     */
+    public List<String> search(String query) {
+        query = query.toLowerCase();
+        return index.getOrDefault(query, new ArrayList<>());
     }
 
-    // Prints all indexed files and their content
-    public void printIndexedFiles() {
-        fileContentMap.forEach((fileName, content) -> {
-            System.out.println("File: " + fileName);
-            System.out.println("Content: " + content);
-            System.out.println("------");
-        });
+
+    /**
+     * Returns the current index.
+     * @return A map representing the index of words to file names.
+     */
+    public Map<String, List<String>> getIndex() {
+        return index;
+    }
+    
+
+    /**
+     * Displays the entire index for debugging purposes.
+     */
+    public void displayIndex() {
+        for (Map.Entry<String, List<String>> entry : index.entrySet()) {
+            System.out.println("Word: " + entry.getKey() + " -> Files: " + entry.getValue());
+        }
     }
 }
