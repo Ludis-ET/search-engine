@@ -2,11 +2,15 @@ package gui;
 
 import engine.localdb.FileHandler;
 import engine.localdb.Indexer;
+import engine.localdb.SpellChecker;
+import engine.localdb.SynonymHandler;
+import engine.search.AdvancedSearch;
+
+import javax.swing.*;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.io.File;
 import java.util.List;
-import javax.swing.*;
-import javax.swing.event.DocumentListener;
 
 public class SearchEngineUI {
     private static final String DB_PATH = "db";
@@ -14,6 +18,9 @@ public class SearchEngineUI {
     private JTextField searchField;
     private JTextArea resultsArea;
     private JLabel statusLabel;
+    private SpellChecker spellChecker = new SpellChecker();
+    private SynonymHandler synonymHandler = new SynonymHandler();
+    private AdvancedSearch advancedSearch = new AdvancedSearch();
     private Color primaryColor = new Color(45, 52, 54);
     private Color accentColor = new Color(116, 185, 255);
     private Color textColor = Color.WHITE;
@@ -152,49 +159,22 @@ public class SearchEngineUI {
         List<File> files = fileHandler.listFiles(".txt");
         indexer.indexFiles(files, fileHandler);
 
-        List<String> results = indexer.search(query);
+        query = spellChecker.correctQuery(query);
+        String[] synonyms = synonymHandler.getSynonyms(query);
+
+        List<String> results = advancedSearch.searchWithSynonyms(indexer, query, synonyms);
 
         if (results.isEmpty()) {
             resultsArea.setText("No Results Found!");
             statusLabel.setText("0 results found.");
         } else {
             StringBuilder resultText = new StringBuilder();
-            for (int i = 0; i < results.size(); i++) {
-                String result = results.get(i);
-                String fileName = "file" + (i + 1) + ".txt";
-                resultText.append("Result ").append(i + 1).append(": ").append(result).append("\n");
-                JButton fileButton = createFileButton(fileName, fileHandler);
-                resultText.append(" - ").append(fileButton.getText()).append("\n");
+            for (String result : results) {
+                resultText.append(result).append("\n\n");
             }
             resultsArea.setText(resultText.toString());
             statusLabel.setText(results.size() + " results found.");
         }
-    }
-
-    private JButton createFileButton(String fileName, FileHandler fileHandler) {
-        JButton fileButton = new JButton(fileName);
-        fileButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        fileButton.setBackground(buttonColor);
-        fileButton.setForeground(textColor);
-        fileButton.setFocusPainted(false);
-        fileButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        fileButton.addActionListener(ev -> {
-            File targetFile = fileHandler.getFile(fileName);
-            if (targetFile != null) {
-                List<String> content = fileHandler.readFileContent(targetFile);
-                JTextArea fileContentArea = new JTextArea(String.join("\n", content));
-                fileContentArea.setEditable(false);
-                fileContentArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
-                JScrollPane fileScrollPane = new JScrollPane(fileContentArea);
-
-                JOptionPane.showMessageDialog(frame, fileScrollPane, "File Content: " + fileName,
-                        JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(frame, "File not found: " + fileName,
-                        "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        return fileButton;
     }
 
     private void clearSearch() {
