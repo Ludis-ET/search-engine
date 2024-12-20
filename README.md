@@ -1,18 +1,51 @@
-## Getting Started
+# Search Engine
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+A search engine built to index and search documents efficiently.
 
-## Folder Structure
+## Features
 
-The workspace contains two folders by default, where:
+- Fast indexing of documents
+- Efficient search algorithms
+- User-friendly interface
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+## Installation
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+Clone the repository:
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
+```bash
+git clone https://github.com/ludis-et/search-engine.git
+```
 
-## Dependency Management
+Navigate to the project directory:
 
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+```bash
+cd search-engine
+```
+
+Install the required dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Usage
+
+To index documents:
+
+```bash
+python indexer.py /path/to/documents
+```
+
+To perform a search:
+
+```bash
+python search.py "your search query"
+```
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License.
