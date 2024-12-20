@@ -1,10 +1,10 @@
-package com.searchengine.engine;
+package engine;
 
-import com.searchengine.engine.localDB.FileHandler;
-import com.searchengine.engine.localDB.Indexer;
+
+import engine.localDB.FileHandler;
+import engine.localDB.Indexer;
 import java.io.File;
 import java.util.*;
-
 
 public class SearchManager {
     private final FileHandler fileHandler;
@@ -26,7 +26,7 @@ public class SearchManager {
 
     public String search(String query) {
         query = query.toLowerCase();
-        List<String> resultFiles = indexer.search(query);
+        Set<String> resultFiles = indexer.search(query);
         List<String> results = new ArrayList<>();
 
         for (String fileName : resultFiles) {
