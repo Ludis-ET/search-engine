@@ -2,13 +2,12 @@ package gui;
 
 import engine.localdb.FileHandler;
 import engine.localdb.Indexer;
-import engine.localdb.SpellChecker;
-import engine.localdb.SynonymHandler;
-import engine.search.AdvancedSearch;
+import engine.core.AdvancedSearchEngine;
 
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.List;
 
@@ -18,9 +17,7 @@ public class SearchEngineUI {
     private JTextField searchField;
     private JTextArea resultsArea;
     private JLabel statusLabel;
-    private SpellChecker spellChecker = new SpellChecker();
-    private SynonymHandler synonymHandler = new SynonymHandler();
-    private AdvancedSearch advancedSearch = new AdvancedSearch();
+    private AdvancedSearchEngine searchEngine = new AdvancedSearchEngine();
     private Color primaryColor = new Color(45, 52, 54);
     private Color accentColor = new Color(116, 185, 255);
     private Color textColor = Color.WHITE;
@@ -45,6 +42,14 @@ public class SearchEngineUI {
         frame.add(centerPanel, BorderLayout.CENTER);
         frame.add(statusLabel, BorderLayout.SOUTH);
         frame.setVisible(true);
+
+        initializeSearchEngine();
+    }
+
+    private void initializeSearchEngine() {
+        FileHandler fileHandler = new FileHandler(DB_PATH);
+        searchEngine.setFileHandler(fileHandler);
+        searchEngine.indexFiles(fileHandler.listFiles(".txt"));
     }
 
     private void setLookAndFeel() {
@@ -154,26 +159,37 @@ public class SearchEngineUI {
     }
 
     private void search(String query) {
-        FileHandler fileHandler = new FileHandler(DB_PATH);
-        Indexer indexer = new Indexer();
-        List<File> files = fileHandler.listFiles(".txt");
-        indexer.indexFiles(files, fileHandler);
-
-        query = spellChecker.correctQuery(query);
-        String[] synonyms = synonymHandler.getSynonyms(query);
-
-        List<String> results = advancedSearch.searchWithSynonyms(indexer, query, synonyms);
+        List<String> results = searchEngine.search(query);
 
         if (results.isEmpty()) {
             resultsArea.setText("No Results Found!");
             statusLabel.setText("0 results found.");
         } else {
-            StringBuilder resultText = new StringBuilder();
-            for (String result : results) {
-                resultText.append(result).append("\n\n");
-            }
-            resultsArea.setText(resultText.toString());
+            resultsArea.setText("");
             statusLabel.setText(results.size() + " results found.");
+            for (String result : results) {
+                JButton resultButton = createResultButton(result);
+                resultsArea.insert(result + "\n", resultsArea.getCaretPosition());
+                resultButton.addActionListener(e -> showFileDetails(result.split(" ")[2]));
+            }
+        }
+    }
+
+    private JButton createResultButton(String fileName) {
+        JButton button = new JButton(fileName);
+        button.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        button.setBackground(buttonColor);
+        button.setForeground(textColor);
+        return button;
+    }
+
+    private void showFileDetails(String fileName) {
+        File file = searchEngine.getFileHandler().getFile(fileName);
+        if (file != null) {
+            List<String> content = searchEngine.getFileHandler().readFileContent(file);
+            JOptionPane.showMessageDialog(frame, String.join("\n", content), "File Details", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(frame, "File not found!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

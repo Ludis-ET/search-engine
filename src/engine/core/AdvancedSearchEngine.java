@@ -20,6 +20,10 @@ public class AdvancedSearchEngine extends SearchEngine {
         this.fileHandler = fileHandler;
     }
 
+    public FileHandler getFileHandler() {
+        return fileHandler;
+    }
+
     @Override
     public void indexFiles(List<File> files) {
         indexer.indexFiles(files, fileHandler);
