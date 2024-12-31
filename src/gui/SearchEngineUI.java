@@ -8,8 +8,10 @@ import javax.swing.*;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.io.*;
 import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class SearchEngineUI {
     private static final String DB_PATH = "db";
@@ -23,10 +25,12 @@ public class SearchEngineUI {
     private Color textColor = Color.WHITE;
     private Color buttonColor = new Color(0, 184, 148);
 
+    // Launch the UI
     public static void launchUI() {
         new SearchEngineUI().createUI();
     }
 
+    // Create the UI components and layout
     private void createUI() {
         frame = new JFrame("Search Engine");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -46,12 +50,14 @@ public class SearchEngineUI {
         initializeSearchEngine();
     }
 
+    // Initialize the search engine by setting up the file handler and indexing files
     private void initializeSearchEngine() {
         FileHandler fileHandler = new FileHandler(DB_PATH);
         searchEngine.setFileHandler(fileHandler);
-        searchEngine.indexFiles(fileHandler.listFiles(".txt"));
+        searchEngine.indexFiles(fileHandler.listFiles(".txt", ".csv", ".xml", ".json"));
     }
 
+    // Set the look and feel for the UI
     private void setLookAndFeel() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -60,6 +66,7 @@ public class SearchEngineUI {
         }
     }
 
+    // Create the top panel with title and search bar
     private JPanel createTopPanel() {
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(primaryColor);
@@ -94,6 +101,7 @@ public class SearchEngineUI {
         return topPanel;
     }
 
+    // Create the center panel with results area
     private JPanel createCenterPanel() {
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(new Color(39, 60, 117));
@@ -119,6 +127,7 @@ public class SearchEngineUI {
         return centerPanel;
     }
 
+    // Create status label
     private JLabel createStatusLabel() {
         JLabel label = new JLabel("Welcome to the Search Engine!");
         label.setFont(new Font("SansSerif", Font.ITALIC, 14));
@@ -127,6 +136,7 @@ public class SearchEngineUI {
         return label;
     }
 
+    // Create a listener for search field to handle search as text is typed
     private DocumentListener createSearchFieldListener() {
         return new javax.swing.event.DocumentListener() {
             void performSearch() {
@@ -158,6 +168,7 @@ public class SearchEngineUI {
         };
     }
 
+    // Perform the search based on the query and update the UI with results
     private void search(String query) {
         List<String> results = searchEngine.search(query);
 
@@ -175,6 +186,7 @@ public class SearchEngineUI {
         }
     }
 
+    // Create a button for each result that displays the file name
     private JButton createResultButton(String fileName) {
         JButton button = new JButton(fileName);
         button.setFont(new Font("SansSerif", Font.PLAIN, 16));
@@ -183,16 +195,70 @@ public class SearchEngineUI {
         return button;
     }
 
+    // Show file details in a dialog box when a file is selected
     private void showFileDetails(String fileName) {
         File file = searchEngine.getFileHandler().getFile(fileName);
         if (file != null) {
-            List<String> content = searchEngine.getFileHandler().readFileContent(file);
+            List<String> content = readFileContent(file);
             JOptionPane.showMessageDialog(frame, String.join("\n", content), "File Details", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(frame, "File not found!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    // Read the content of the file based on its extension
+    private List<String> readFileContent(File file) {
+        try {
+            String fileName = file.getName().toLowerCase();
+            if (fileName.endsWith(".txt")) {
+                return Files.readAllLines(file.toPath());
+            } else if (fileName.endsWith(".csv")) {
+                return readCsvFile(file);
+            } else if (fileName.endsWith(".xml")) {
+                return readXmlFile(file);
+            } else if (fileName.endsWith(".json")) {
+                return readJsonFile(file);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return List.of("Error reading file.");
+    }
+
+    // Read the CSV file content
+    private List<String> readCsvFile(File file) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        List<String> content = new java.util.ArrayList<>();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            content.add(line);
+        }
+        return content;
+    }
+
+    // Read the XML file content
+    private List<String> readXmlFile(File file) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        List<String> content = new java.util.ArrayList<>();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            content.add(line);
+        }
+        return content;
+    }
+
+    // Read the JSON file content
+    private List<String> readJsonFile(File file) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        List<String> content = new java.util.ArrayList<>();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            content.add(line);
+        }
+        return content;
+    }
+
+    // Clear the search field and reset results
     private void clearSearch() {
         searchField.setText("");
         resultsArea.setText("");

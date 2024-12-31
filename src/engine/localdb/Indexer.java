@@ -19,7 +19,7 @@ public class Indexer {
             List<String> lines = entry.getValue();
             for (int i = 0; i < lines.size(); i++) {
                 if (lines.get(i).toLowerCase().contains(query.toLowerCase())) {
-                    results.add("Found in: " + entry.getKey().getName() + " at line " + (i + 1) + "\n\t=> " + lines.get(i));
+                    results.add("\n\nFound in: " + entry.getKey().getName() + " at line " + (i + 1) + "\n\t=> " + lines.get(i));
                 }
             }
         }
