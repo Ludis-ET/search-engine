@@ -1,17 +1,13 @@
 package gui;
 
-import engine.localdb.FileHandler;
-import engine.localdb.Indexer;
 import engine.core.AdvancedSearchEngine;
-
+import engine.localdb.FileHandler;
+import java.awt.*;
+import java.io.*;
+import java.nio.file.Files;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.*;
-import java.util.List;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class SearchEngineUI {
     private static final String DB_PATH = "db";
