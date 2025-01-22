@@ -3,8 +3,6 @@ package gui;
 import engine.core.AdvancedSearchEngine;
 import engine.localdb.FileHandler;
 import java.awt.*;
-import java.io.*;
-import java.nio.file.Files;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
@@ -175,85 +173,11 @@ public class SearchEngineUI {
             resultsArea.setText("");
             statusLabel.setText(results.size() + " results found.");
             for (String result : results) {
-                JButton resultButton = createResultButton(result);
                 resultsArea.insert(result + "\n", resultsArea.getCaretPosition());
-                resultButton.addActionListener(e -> showFileDetails(result.split(" ")[2]));
             }
         }
     }
-
-    // Create a button for each result that displays the file name
-    private JButton createResultButton(String fileName) {
-        JButton button = new JButton(fileName);
-        button.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        button.setBackground(buttonColor);
-        button.setForeground(textColor);
-        return button;
-    }
-
-    // Show file details in a dialog box when a file is selected
-    private void showFileDetails(String fileName) {
-        File file = searchEngine.getFileHandler().getFile(fileName);
-        if (file != null) {
-            List<String> content = readFileContent(file);
-            JOptionPane.showMessageDialog(frame, String.join("\n", content), "File Details", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(frame, "File not found!", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    // Read the content of the file based on its extension
-    private List<String> readFileContent(File file) {
-        try {
-            String fileName = file.getName().toLowerCase();
-            if (fileName.endsWith(".txt")) {
-                return Files.readAllLines(file.toPath());
-            } else if (fileName.endsWith(".csv")) {
-                return readCsvFile(file);
-            } else if (fileName.endsWith(".xml")) {
-                return readXmlFile(file);
-            } else if (fileName.endsWith(".json")) {
-                return readJsonFile(file);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return List.of("Error reading file.");
-    }
-
-    // Read the CSV file content
-    private List<String> readCsvFile(File file) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        List<String> content = new java.util.ArrayList<>();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            content.add(line);
-        }
-        return content;
-    }
-
-    // Read the XML file content
-    private List<String> readXmlFile(File file) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        List<String> content = new java.util.ArrayList<>();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            content.add(line);
-        }
-        return content;
-    }
-
-    // Read the JSON file content
-    private List<String> readJsonFile(File file) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        List<String> content = new java.util.ArrayList<>();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            content.add(line);
-        }
-        return content;
-    }
-
+    
     // Clear the search field and reset results
     private void clearSearch() {
         searchField.setText("");
